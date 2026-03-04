@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:air/attachments/attachments.dart';
+import 'package:air/core/lib.dart';
 import 'package:air/l10n/app_localizations_extension.dart';
 import 'package:air/main.dart';
 import 'package:air/message_list/emoji_repository.dart';
@@ -91,6 +92,9 @@ class _MessageComposerState extends State<MessageComposer>
     // 1. Initially loaded draft
     // 2. Editing ID has changed
     MessageId? currentEditingId;
+
+    MimiId? currentInReplyToId;
+
     _draftLoadingSubscription = _chatDetailsCubit.stream.listen((state) {
       // Check that chat is fully loaded
       if (state.chat == null) {
@@ -112,6 +116,14 @@ class _MessageComposerState extends State<MessageComposer>
             _inputController.text = draft?.message ?? "";
           }
           currentEditingId = draft?.editingId;
+        // Reply ID has changed
+        case final draft when draft?.inReplyTo?.mimiId != currentInReplyToId:
+          // If input controller is not empty, then the user already typed something,
+          // and we don't want to overwrite it.
+          if (_inputController.text.isEmpty) {
+            _inputController.text = draft?.message ?? "";
+          }
+          currentInReplyToId = draft?.inReplyTo?.mimiId;
         default:
       }
     });
@@ -145,12 +157,17 @@ class _MessageComposerState extends State<MessageComposer>
 
   @override
   Widget build(BuildContext context) {
-    final (chatTitle, editingId, isConfirmedChat) = context.select((
-      ChatDetailsCubit cubit,
-    ) {
-      final chat = cubit.state.chat;
-      return (chat?.title, chat?.draft?.editingId, chat?.isConfirmed ?? false);
-    });
+    final (chatTitle, editingId, inReplyToId, isConfirmedChat) = context.select(
+      (ChatDetailsCubit cubit) {
+        final chat = cubit.state.chat;
+        return (
+          chat?.title,
+          chat?.draft?.editingId,
+          chat?.draft?.inReplyTo?.mimiId,
+          chat?.isConfirmed ?? false,
+        );
+      },
+    );
 
     if (chatTitle == null) {
       return const SizedBox.shrink();
@@ -185,6 +202,7 @@ class _MessageComposerState extends State<MessageComposer>
                   controller: _inputController,
                   chatTitle: chatTitle,
                   isEditing: editingId != null,
+                  isReplying: inReplyToId != null,
                   layerLink: _inputFieldLink,
                   inputKey: _inputFieldKey,
                   onSubmitMessage: () =>
@@ -528,6 +546,7 @@ class _MessageInput extends StatelessWidget {
     required TextEditingController controller,
     required this.chatTitle,
     required this.isEditing,
+    required this.isReplying,
     required this.layerLink,
     required this.inputKey,
     required this.onSubmitMessage,
@@ -540,6 +559,7 @@ class _MessageInput extends StatelessWidget {
   final TextEditingController _controller;
   final String? chatTitle;
   final bool isEditing;
+  final bool isReplying;
   final LayerLink layerLink;
   final GlobalKey inputKey;
   final VoidCallback onSubmitMessage;
@@ -556,9 +576,12 @@ class _MessageInput extends StatelessWidget {
       (ChatDetailsCubit cubit) => cubit.state.chat?.isConfirmed ?? false,
     );
 
-    // final inReplyTo = context.select(
-    //   (ChatDetailsCubit cubit) => cubit.state.chat?.draft?.inReplyTo,
-    // );
+    final (isEditing, inReplyTo) = context.select(
+      (ChatDetailsCubit cubit) => (
+        cubit.state.chat?.draft?.editingId != null,
+        cubit.state.chat?.draft?.inReplyTo,
+      ),
+    );
 
     final loc = AppLocalizations.of(context);
     final color = CustomColorScheme.of(context);
@@ -590,6 +613,16 @@ class _MessageInput extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+
+        if (inReplyTo != null)
+          Padding(
+            padding: const EdgeInsets.only(
+              top: Spacings.xs,
+              left: Spacings.xxs,
+              right: Spacings.xxs,
+            ),
+            child: _InReplyToBubble(inReplyTo: inReplyTo),
           ),
         CompositedTransformTarget(
           key: inputKey,
@@ -698,3 +731,19 @@ class _MessageInput extends StatelessWidget {
 }
 
 enum Direction { right, left }
+
+class _InReplyToBubble extends StatelessWidget {
+  const _InReplyToBubble({required this.inReplyTo});
+
+  final UiInReplyToMessage inReplyTo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(inReplyTo.sender.toString()),
+        Text(inReplyTo.mimiContent.plainBody ?? ""),
+      ],
+    );
+  }
+}

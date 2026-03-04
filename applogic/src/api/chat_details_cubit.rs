@@ -435,6 +435,7 @@ impl ChatDetailsCubitBase {
     pub async fn reply_to_message(&self, message_id: MessageId) -> anyhow::Result<()> {
         // Load message
         let Some(chat_message) = self.context.store.message(message_id).await? else {
+            warn!("could not load selected message to stage a reply");
             return Ok(());
         };
 
@@ -460,12 +461,13 @@ impl ChatDetailsCubitBase {
             let Some(chat) = state.chat.as_mut() else {
                 return false;
             };
+
             let draft = chat.draft.get_or_insert_with(UiMessageDraft::empty);
             if draft.editing_id.is_some() {
                 return false;
             }
 
-            draft.message = String::new();
+            draft.message = "TYPE YOUR REPLY HERE".to_string();
             draft.in_reply_to = Some(UiInReplyToMessage {
                 mimi_id,
                 message_id,

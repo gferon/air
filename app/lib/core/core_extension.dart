@@ -5,7 +5,9 @@
 import 'dart:typed_data';
 
 import 'package:air/core/core.dart';
+import 'package:air/l10n/app_localizations.dart';
 import 'package:air/util/platform.dart';
+import 'package:flutter/widgets.dart';
 import 'package:uuid/uuid.dart';
 
 extension UiChatDetailsExtension on UiChatDetails {
@@ -166,4 +168,15 @@ extension UiChatMessageExtension on UiChatMessage {
 
 extension UiAttachmentExtension on UiAttachment {
   bool get isImage => imageMetadata != null;
+}
+
+extension UiContentMessageExtension on UiContentMessage {
+  String? plaintextPreview(AppLocalizations loc) =>
+      content.plainBody?.isNotEmpty == true
+      ? content.plainBody
+      : content.attachments.isNotEmpty
+      ? content.attachments.first.imageMetadata != null
+            ? loc.chatList_imageEmoji
+            : loc.chatList_fileEmoji
+      : '';
 }
