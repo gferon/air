@@ -194,6 +194,7 @@
   "linkConfirmation_description": "Prüfe die URL, um sicherzugehen, dass du sie öffnen möchtest:",
   "linkConfirmation_openLink": "Öffnen",
   "linkConfirmation_cancel": "Abbrechen",
+  "messageContextMenu_reply": "Antworten",
   "messageContextMenu_copy": "Kopieren",
   "messageContextMenu_edit": "Bearbeiten",
   "messageContextMenu_delete": "Löschen",

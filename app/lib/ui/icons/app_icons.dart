@@ -36,6 +36,7 @@ enum AppIconType {
   refreshCcw,
   refreshCw,
   repeat,
+  reply,
   search,
   send,
   settings,
@@ -131,6 +132,9 @@ final Map<AppIconType, _InlineBytesLoader> _compiledSvgLoaders = {
   ),
   AppIconType.repeat: const _InlineBytesLoader(
     'Yi2IAAEpAADAQQAAwEEdAAAA/wEBAwAAgEAAAOA/AAD//xsAAAADAAAAAAEBBgAAAAAAAAAAiEEAAABAAACoQQAAwEAAAIhBAAAgQRsAAQAEAAAAAAECAQwAAAAAAEBAAAAwQQAAQEAAACBBAABAQLxO+UC8TplAAADAQAAA4EAAAMBAAACoQQAAwEAbAAIAAwAAAAABAQYAAAAAAADgQAAAsEEAAEBAAACQQQAA4EAAAGBBGwADAAQAAAAAAQIBDAAAAAAAqEEAAFBBAACoQQAAYEEAAKhBUayBQVGsmUEAAJBBAACIQQAAkEEAAEBAAACQQTAeAAAAAP//HgEAAAD//x4CAAAA//8eAwAAAP//',
+  ),
+  AppIconType.reply: const _InlineBytesLoader(
+    'Yi2IAAEpAADAQQAAwEEcHh4f8gMAAP//GwAAABUAAAAAAQICAQECAgECAQICAQECAgECAgNUAAAAAAAAzP+YQcz/n0HM/5hBl/9PQcz/mEHTvEJBAV6WQRkENkHgrZFB16MsQYv9jEEtQyNBLaGGQbf/HUGX/39Bt/8dQWufw0C3/x1BtucZQcIXVkFbXx9BXI9bQVtfH0E7cGRBtucZQdXnaUEccBRBcF9vQVyPC0FwX29BtxcGQdXnaUHdXlhAtucZQUmAQkAccBRBSYBCQFyPC0HdXlhAtxcGQbcXBkHdXlhAXI8LQUmAQkAccBRBSYBCQLbnGUHdXlhAW18fQXE9bkBbXx9BN+CIQLbnGUFsz5NAa5/DQLf/AUGX/39Bt/8BQdxXikG3/wFBlkOUQQI3CkHek5tBvNcYQSbkokFseCdBzP+mQd9PO0HM/6ZBl/9PQcz/pkHM/59BzP+mQZjdo0GY3aNBzP+mQcz/n0HM/6ZBNCKcQcz/pkHM/5hBmN2jQcz/mEHM/59BMB4AAAAA//8=',
   ),
   AppIconType.search: const _InlineBytesLoader(
     'Yi2IAAEpAADAQQAAwEEdAAAA/wEBAwAAgEAAAOA/AAD//xsAAAACAAAAAAEEAAAAAACoQQAAqEGuR4VBrkeFQRsAAQAGAAAAAAICAgIDGgAAAAAAAAAwQQAAQEAnpXZBAABAQAAAmEGytdJAAACYQQAAMEEAAJhBJ6V2QSeldkEAAJhBAAAwQQAAmEGytdJAAACYQQAAQEAnpXZBAABAQAAAMEEAAEBAsrXSQLK10kAAAEBAAAAwQQAAQEAwHgAAAAD//x4BAAAA//8=',
@@ -314,6 +318,11 @@ class AppIcon extends StatelessWidget {
 
   const AppIcon.repeat({super.key, this.size, this.color})
     : type = AppIconType.repeat,
+      fit = BoxFit.contain,
+      alignment = Alignment.center;
+
+  const AppIcon.reply({super.key, this.size, this.color})
+    : type = AppIconType.reply,
       fit = BoxFit.contain,
       alignment = Alignment.center;
 

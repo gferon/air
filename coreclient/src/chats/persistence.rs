@@ -984,6 +984,7 @@ pub mod tests {
         MessageDraft {
             message: "    ".into(), // Whitespace only
             editing_id: None,
+            in_reply_to: None,
             updated_at: TimeStamp::now().into(),
             is_committed: false,
         }
@@ -998,6 +999,7 @@ pub mod tests {
         MessageDraft {
             message: "Hello, world!".to_string(),
             editing_id: Some(message.id()),
+            in_reply_to: None,
             updated_at: Utc::now(),
             is_committed: true,
         }
@@ -1012,6 +1014,7 @@ pub mod tests {
         MessageDraft {
             message: "Hello, world!".to_string(),
             editing_id: Some(message.id()),
+            in_reply_to: None,
             updated_at: Utc::now().checked_add_days(Days::new(1)).unwrap(),
             is_committed: true,
         }

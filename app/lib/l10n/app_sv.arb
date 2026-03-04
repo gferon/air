@@ -195,6 +195,7 @@
   "linkConfirmation_description": "Kontrollera webbadressen så att du är säker på att du vill öppna den:",
   "linkConfirmation_openLink": "Öppna",
   "linkConfirmation_cancel": "Avbryt",
+  "messageContextMenu_reply": "Svara",
   "messageContextMenu_copy": "Kopiera",
   "messageContextMenu_edit": "Redigera",
   "messageContextMenu_delete": "Radera",

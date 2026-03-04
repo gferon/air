@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT\n                message_id AS \"message_id: _\",\n                chat_id AS \"chat_id: _\",\n                mimi_id AS \"mimi_id: _\",\n                timestamp AS \"timestamp: _\",\n                sender_user_uuid AS \"sender_user_uuid: _\",\n                sender_user_domain AS \"sender_user_domain: _\",\n                content AS \"content: _\",\n                sent,\n                status,\n                edited_at AS \"edited_at: _\",\n                b.user_uuid IS NOT NULL AS \"is_blocked!: _\"\n            FROM message\n            LEFT JOIN blocked_contact b ON b.user_uuid = sender_user_uuid\n                AND b.user_domain = sender_user_domain\n            WHERE chat_id = ?\n                AND sender_user_uuid = ?\n                AND sender_user_domain = ?\n            ORDER BY timestamp DESC LIMIT 1",
+  "query": "SELECT\n                message_id AS \"message_id: _\",\n                chat_id AS \"chat_id: _\",\n                mimi_id AS \"mimi_id: _\",\n                timestamp AS \"timestamp: _\",\n                sender_user_uuid AS \"sender_user_uuid: _\",\n                sender_user_domain AS \"sender_user_domain: _\",\n                content AS \"content: _\",\n                sent,\n                status,\n                edited_at AS \"edited_at: _\",\n                b.user_uuid IS NOT NULL AS \"is_blocked!: _\",\n                NULL AS \"in_reply_to_message_id: _\",\n                NULL AS \"in_reply_to_content: _\"\n            FROM message\n            LEFT JOIN blocked_contact b ON b.user_uuid = sender_user_uuid\n                AND b.user_domain = sender_user_domain\n            WHERE chat_id = ?\n                AND sender_user_uuid = ?\n                AND sender_user_domain = ?\n            ORDER BY timestamp DESC LIMIT 1",
   "describe": {
     "columns": [
       {
@@ -57,6 +57,16 @@
         "name": "is_blocked!: _",
         "ordinal": 10,
         "type_info": "Null"
+      },
+      {
+        "name": "in_reply_to_message_id: _",
+        "ordinal": 11,
+        "type_info": "Null"
+      },
+      {
+        "name": "in_reply_to_content: _",
+        "ordinal": 12,
+        "type_info": "Null"
       }
     ],
     "parameters": {
@@ -73,8 +83,10 @@
       false,
       false,
       true,
+      null,
+      null,
       null
     ]
   },
-  "hash": "34bbd0644230ea63e663548ea36066e92514f44767ebb0ce80a1d4cef373c591"
+  "hash": "3ab60de1e41550441ce660aa6ad5d1018232653591a85c2b5d855d03141cefb0"
 }

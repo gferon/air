@@ -6,6 +6,7 @@
 
 use std::{collections::HashMap, path::PathBuf, time::Duration};
 
+pub use aircommon::identifiers::MimiId;
 use aircommon::{
     OpenMlsRand, RustCrypto,
     identifiers::{AttachmentId, UserId},
@@ -21,10 +22,10 @@ use flutter_rust_bridge::frb;
 use mimi_content::MimiContent;
 use tokio::{sync::watch, time::sleep};
 use tokio_stream::StreamExt;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
-use crate::message_content::MimiContentExt;
-use crate::{StreamSink, mark_as_read::MarkAsReadState};
+use crate::{StreamSink, api::types::UiInReplyToMessage, mark_as_read::MarkAsReadState};
+use crate::{api::types::UiMessageDraft, message_content::MimiContentExt};
 use crate::{
     api::{
         attachments_repository::{AttachmentTaskHandle, AttachmentsRepository, InProgressMap},
@@ -47,7 +48,7 @@ use super::{types::UiChatDetails, user_cubit::UserCubitBase};
 ///
 /// Also see [`ChatDetailsCubitBase`].
 #[frb(dart_metadata = ("freezed"))]
-#[derive(Debug, Clone, Default, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct ChatDetailsState {
     pub chat: Option<UiChatDetails>,
     pub members: Vec<UiUserId>,
@@ -361,10 +362,10 @@ impl ChatDetailsCubitBase {
                 }
                 Some(_) => false,
                 None => {
-                    chat.draft.replace(MessageDraft {
+                    chat.draft.replace(UiMessageDraft {
                         message: draft_message,
                         is_committed,
-                        ..MessageDraft::empty()
+                        ..UiMessageDraft::empty()
                     });
                     true
                 }
@@ -414,12 +415,57 @@ impl ChatDetailsCubitBase {
             let Some(chat) = state.chat.as_mut() else {
                 return false;
             };
-            let draft = chat.draft.get_or_insert_with(MessageDraft::empty);
+            let draft = chat.draft.get_or_insert_with(UiMessageDraft::empty);
             if draft.editing_id.is_some() {
                 return false;
             }
             draft.message = body.to_owned();
             draft.editing_id = Some(message.id());
+            draft.is_committed = false;
+            true
+        });
+
+        if changed {
+            self.store_draft_from_state().await?;
+        }
+
+        Ok(())
+    }
+
+    pub async fn reply_to_message(&self, message_id: MessageId) -> anyhow::Result<()> {
+        // Load message
+        let Some(message) = self.context.store.message(message_id).await? else {
+            return Ok(());
+        };
+
+        // If this message doesn't have a sender, do nothing, it's not worth replying to.
+        let Some(sender) = message.message().sender() else {
+            warn!("tried to reply to a message without sender, this is not possible.");
+            return Ok(());
+        };
+
+        // If this message doesn't have a content, do nothing
+        let Some(mimi_content) = message.message().mimi_content() else {
+            warn!("tried to reply to a message without MIMI content, this is not possible.");
+            return Ok(());
+        };
+
+        // Update draft in state
+        let changed = self.core.state_tx().send_if_modified(|state| {
+            let Some(chat) = state.chat.as_mut() else {
+                return false;
+            };
+            let draft = chat.draft.get_or_insert_with(UiMessageDraft::empty);
+            if draft.editing_id.is_some() {
+                return false;
+            }
+
+            draft.message = String::new();
+            draft.in_reply_to = Some(UiInReplyToMessage {
+                message_id,
+                sender: sender.clone().into(),
+                mimi_content: mimi_content.clone().into(),
+            });
             draft.is_committed = false;
             true
         });
@@ -438,7 +484,7 @@ impl ChatDetailsCubitBase {
             .borrow()
             .chat
             .as_ref()
-            .and_then(|c| c.draft.clone());
+            .and_then(|c| c.draft.into_draft_without_content());
         self.context
             .store
             .store_message_draft(self.context.chat_id, draft.as_ref())

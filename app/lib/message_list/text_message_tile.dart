@@ -309,68 +309,62 @@ class _MessageView extends HookWidget {
 
     const iconSize = 16.0;
 
-    final actions = <MessageAction>[
+    final actions = <ContextMenuEntry>[
+      ContextMenuItem(
+        label: loc.messageContextMenu_reply,
+        leading: const AppIcon.reply(size: iconSize),
+        onPressed: () {
+          context.read<ChatDetailsCubit>().replyToMessage(messageId: messageId);
+        },
+      ),
       if (plainBody != null && plainBody.isNotEmpty)
-        MessageAction(
+        ContextMenuItem(
           label: loc.messageContextMenu_copy,
           leading: const AppIcon.copy(size: iconSize),
-          onSelected: () {
+          onPressed: () {
             Clipboard.setData(ClipboardData(text: plainBody));
           },
         ),
       if (isSender && attachments.isEmpty && !isDeleted)
-        MessageAction(
+        ContextMenuItem(
           label: loc.messageContextMenu_edit,
           leading: const AppIcon.pencil(size: iconSize),
-          onSelected: () {
+          onPressed: () {
             context.read<ChatDetailsCubit>().editMessage(messageId: messageId);
           },
         ),
-      if (!isDeleted)
-        MessageAction(
+      if (!isDeleted) ...[
+        const ContextMenuSeparator(),
+        ContextMenuItem(
           label: loc.messageContextMenu_delete,
           leading: AppIcon.trash(size: iconSize, color: colors.function.danger),
           isDestructive: true,
-          onSelected: () => isSender
+          onPressed: () => isSender
               ? _showDeleteMessageDialog(context: context, messageId: messageId)
               : _showDeleteForMeDialog(context: context, messageId: messageId),
         ),
+      ],
       if (isDeleted)
-        MessageAction(
+        ContextMenuItem(
           label: loc.messageContextMenu_delete,
           leading: AppIcon.trash(size: iconSize, color: colors.function.danger),
           isDestructive: true,
-          onSelected: () =>
+          onPressed: () =>
               _showDeleteForMeDialog(context: context, messageId: messageId),
         ),
       if (attachments.isNotEmpty && !Platform.isIOS)
-        MessageAction(
+        ContextMenuItem(
           label: loc.messageContextMenu_save,
           leading: const AppIcon.download(size: iconSize),
-          onSelected: () => _handleFileSave(context, attachments.first),
+          onPressed: () => _handleFileSave(context, attachments.first),
         ),
       if (attachments.isNotEmpty && Platform.isIOS)
-        MessageAction(
+        ContextMenuItem(
           label: loc.messageContextMenu_share,
           leading: const AppIcon.share(size: iconSize),
-          onSelected: () => _handleFileShare(context, attachments),
+          onPressed: () => _handleFileShare(context, attachments),
         ),
     ];
-
-    final menuItems = <ContextMenuEntry>[];
-    for (final (index, action) in actions.indexed) {
-      if (index > 0) {
-        menuItems.add(const ContextMenuSeparator());
-      }
-      menuItems.add(
-        ContextMenuItem(
-          label: action.label,
-          leading: action.leading,
-          onPressed: action.onSelected,
-          isDestructive: action.isDestructive,
-        ),
-      );
-    }
 
     final metadata = Padding(
       padding: EdgeInsets.only(left: isSender ? 0 : messageHorizontalPadding),
@@ -472,7 +466,7 @@ class _MessageView extends HookWidget {
                   final future = showMobileMessageActions(
                     context: context,
                     anchorRect: anchorRect,
-                    actions: actions,
+                    actions: actions.cast(),
                     messageContent: overlayBubble,
                     alignEnd: isSender,
                   );
@@ -500,7 +494,7 @@ class _MessageView extends HookWidget {
             : ContextMenuDirection.right,
         offset: const Offset(Spacings.xxs, 0),
         controller: contextMenuController,
-        menuItems: menuItems,
+        menuItems: actions,
         cursorPosition: cursorPositionNotifier,
         child: buildMessageShell(
           onLongPress: null,

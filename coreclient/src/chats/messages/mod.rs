@@ -103,6 +103,7 @@ impl MessageId {
 pub struct ChatMessage {
     pub(super) chat_id: ChatId,
     pub(super) message_id: MessageId,
+    pub(super) in_reply_to: Option<InReplyToMessage>,
     pub(super) timestamped_message: TimestampedMessage,
     pub(super) status: MessageStatus,
 }
@@ -118,6 +119,7 @@ impl ChatMessage {
         Self {
             chat_id,
             message_id,
+            in_reply_to: None,
             timestamped_message,
             status: MessageStatus::Unread,
         }
@@ -144,6 +146,7 @@ impl ChatMessage {
         Self {
             chat_id,
             message_id,
+            in_reply_to: None,
             timestamped_message: TimestampedMessage { timestamp, message },
             status: MessageStatus::Unread,
         }
@@ -166,6 +169,7 @@ impl ChatMessage {
         Self {
             chat_id,
             message_id,
+            in_reply_to: None,
             timestamped_message,
             status: MessageStatus::Unread,
         }
@@ -245,6 +249,13 @@ impl ChatMessage {
     pub fn message_mut(&mut self) -> &mut Message {
         &mut self.timestamped_message.message
     }
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub struct InReplyToMessage {
+    pub message_id: MessageId,
+    pub sender: UserId,
+    pub mimi_content: Option<MimiContent>,
 }
 
 // WARNING: If this type is changed, a new `VersionedMessage` variant must be

@@ -556,6 +556,10 @@ class _MessageInput extends StatelessWidget {
       (ChatDetailsCubit cubit) => cubit.state.chat?.isConfirmed ?? false,
     );
 
+    // final inReplyTo = context.select(
+    //   (ChatDetailsCubit cubit) => cubit.state.chat?.draft?.inReplyTo,
+    // );
+
     final loc = AppLocalizations.of(context);
     final color = CustomColorScheme.of(context);
 
@@ -576,6 +580,7 @@ class _MessageInput extends StatelessWidget {
                   color: CustomColorScheme.of(context).text.tertiary,
                 ),
                 const SizedBox(width: Spacings.xxs),
+
                 Text(
                   loc.composer_editMessage,
                   style: TextStyle(

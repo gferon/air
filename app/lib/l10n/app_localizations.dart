@@ -1161,6 +1161,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get linkConfirmation_cancel;
 
+  /// No description provided for @messageContextMenu_reply.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get messageContextMenu_reply;
+
   /// No description provided for @messageContextMenu_copy.
   ///
   /// In en, this message translates to:

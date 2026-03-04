@@ -666,6 +666,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get linkConfirmation_cancel => 'Avbryt';
 
   @override
+  String get messageContextMenu_reply => 'Svara';
+
+  @override
   String get messageContextMenu_copy => 'Kopiera';
 
   @override

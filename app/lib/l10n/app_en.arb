@@ -245,6 +245,7 @@
   "linkConfirmation_openLink": "Open",
   "linkConfirmation_cancel": "Cancel",
 
+  "messageContextMenu_reply": "Reply",
   "messageContextMenu_copy": "Copy",
   "messageContextMenu_edit": "Edit",
   "messageContextMenu_delete": "Delete",

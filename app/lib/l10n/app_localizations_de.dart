@@ -670,6 +670,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get linkConfirmation_cancel => 'Abbrechen';
 
   @override
+  String get messageContextMenu_reply => 'Antworten';
+
+  @override
   String get messageContextMenu_copy => 'Kopieren';
 
   @override

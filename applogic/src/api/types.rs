@@ -17,8 +17,8 @@ pub(crate) use aircommon::identifiers::UserHandleValidationError;
 use aircommon::identifiers::UserId;
 use aircoreclient::{
     Asset, ChatAttributes, ChatMessage, ChatStatus, ChatType, Contact, ContentMessage, DisplayName,
-    ErrorMessage, EventMessage, InactiveChat, Message, SystemMessage, TargetedMessageContact,
-    UserProfile, store::Store,
+    ErrorMessage, EventMessage, InReplyToMessage, InactiveChat, Message, SystemMessage,
+    TargetedMessageContact, UserProfile, store::Store,
 };
 use chrono::{DateTime, Duration, Local, Utc};
 use flutter_rust_bridge::frb;
@@ -98,7 +98,7 @@ pub struct UiChat {
 }
 
 /// Details of a chat
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[frb(type_64bit_int)]
 pub struct UiChatDetails {
     pub id: ChatId,
@@ -109,7 +109,7 @@ pub struct UiChatDetails {
     pub messages_count: usize,
     pub unread_messages: usize,
     pub last_message: Option<UiChatMessage>,
-    pub draft: Option<MessageDraft>,
+    pub draft: Option<UiMessageDraft>,
 }
 
 impl UiChatDetails {
@@ -122,15 +122,84 @@ impl UiChatDetails {
 }
 
 /// UI representation of a [`MessageDraft`]
-#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[doc(hidden)]
-#[frb(mirror(MessageDraft))]
 #[frb(dart_metadata = ("freezed"))]
-pub struct _MessageDraft {
+pub struct UiMessageDraft {
     pub message: String,
     pub editing_id: Option<MessageId>,
+    pub in_reply_to: Option<UiInReplyToMessage>,
     pub updated_at: DateTime<Utc>,
     pub is_committed: bool,
+}
+
+impl UiMessageDraft {
+    pub fn empty() -> Self {
+        Self {
+            message: String::new(),
+            in_reply_to: None,
+            editing_id: None,
+            updated_at: Utc::now(),
+            is_committed: false,
+        }
+    }
+
+    pub fn to_draft_without_content(&self) -> MessageDraft {
+        // we clone inside because we ignore the MIMI content (optimisation), so do not change thi method to self
+        MessageDraft {
+            message: self.message.clone(),
+            in_reply_to: self.in_reply_to.map(|irt| irt.into()),
+            editing_id: self.editing_id.clone(),
+            updated_at: self.updated_at,
+            is_committed: self.is_committed,
+        }
+    }
+}
+
+impl From<UiMessageDraft> for MessageDraft {
+    fn from(
+        UiMessageDraft {
+            message,
+            editing_id,
+            in_reply_to,
+            updated_at,
+            is_committed,
+        }: UiMessageDraft,
+    ) -> Self {
+        MessageDraft {
+            message,
+            in_reply_to: in_reply_to.map(Into::into),
+            editing_id,
+            updated_at,
+            is_committed,
+        }
+    }
+}
+
+/// UI representation of a [`InReplyToMessage`]
+#[derive(Debug, Clone, PartialEq)]
+#[doc(hidden)]
+#[frb(dart_metadata = ("freezed"))]
+pub struct UiInReplyToMessage {
+    pub message_id: MessageId,
+    pub sender: UiUserId,
+    pub mimi_content: UiMimiContent,
+}
+
+impl From<UiInReplyToMessage> for InReplyToMessage {
+    fn from(
+        UiInReplyToMessage {
+            message_id,
+            sender,
+            mimi_content,
+        }: UiInReplyToMessage,
+    ) -> Self {
+        InReplyToMessage {
+            message_id,
+            sender: sender.into(),
+            mimi_content: mimi_content.into(),
+        }
+    }
 }
 
 /// Status of a chat

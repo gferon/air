@@ -195,6 +195,8 @@
   "linkConfirmation_description": "Vérifiez l’URL pour vous assurer de vouloir l’ouvrir :",
   "linkConfirmation_openLink": "Ouvrir",
   "linkConfirmation_cancel": "Annuler",
+
+  "messageContextMenu_reply": "Répondre",
   "messageContextMenu_copy": "Copier",
   "messageContextMenu_edit": "Modifier",
   "messageContextMenu_delete": "Supprimer",
