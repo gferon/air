@@ -14,11 +14,11 @@ pub(crate) use aircommon::identifiers::UserHandle;
 pub(crate) use aircoreclient::{AddHandleContactError, ChatId, MessageDraft, MessageId};
 
 pub(crate) use aircommon::identifiers::UserHandleValidationError;
-use aircommon::identifiers::UserId;
+use aircommon::identifiers::{MimiId, UserId};
 use aircoreclient::{
     Asset, ChatAttributes, ChatMessage, ChatStatus, ChatType, Contact, ContentMessage, DisplayName,
-    ErrorMessage, EventMessage, InReplyToMessage, InactiveChat, Message, SystemMessage,
-    TargetedMessageContact, UserProfile, store::Store,
+    ErrorMessage, EventMessage, InactiveChat, Message, SystemMessage, TargetedMessageContact,
+    UserProfile, store::Store,
 };
 use chrono::{DateTime, Duration, Local, Utc};
 use flutter_rust_bridge::frb;
@@ -148,7 +148,10 @@ impl UiMessageDraft {
         // we clone inside because we ignore the MIMI content (optimisation), so do not change thi method to self
         MessageDraft {
             message: self.message.clone(),
-            in_reply_to: self.in_reply_to.map(|irt| irt.into()),
+            in_reply_to: self
+                .in_reply_to
+                .as_ref()
+                .map(|irt| (irt.mimi_id.clone(), None)),
             editing_id: self.editing_id.clone(),
             updated_at: self.updated_at,
             is_committed: self.is_committed,
@@ -156,19 +159,28 @@ impl UiMessageDraft {
     }
 }
 
-impl From<UiMessageDraft> for MessageDraft {
+impl From<MessageDraft> for UiMessageDraft {
     fn from(
-        UiMessageDraft {
+        MessageDraft {
             message,
             editing_id,
             in_reply_to,
             updated_at,
             is_committed,
-        }: UiMessageDraft,
+        }: MessageDraft,
     ) -> Self {
-        MessageDraft {
+        UiMessageDraft {
             message,
-            in_reply_to: in_reply_to.map(Into::into),
+            in_reply_to: in_reply_to.and_then(|(mimi_id, irt)| {
+                Some(UiInReplyToMessage {
+                    mimi_id,
+                    message_id: irt.as_ref().map(|m| m.message_id)?,
+                    sender: irt.as_ref().map(|m| m.sender.clone().into())?,
+                    mimi_content: irt
+                        .as_ref()
+                        .and_then(|m| m.mimi_content.clone().map(Into::into))?,
+                })
+            }),
             editing_id,
             updated_at,
             is_committed,
@@ -181,26 +193,28 @@ impl From<UiMessageDraft> for MessageDraft {
 #[doc(hidden)]
 #[frb(dart_metadata = ("freezed"))]
 pub struct UiInReplyToMessage {
+    pub mimi_id: MimiId,
     pub message_id: MessageId,
     pub sender: UiUserId,
     pub mimi_content: UiMimiContent,
 }
 
-impl From<UiInReplyToMessage> for InReplyToMessage {
-    fn from(
-        UiInReplyToMessage {
-            message_id,
-            sender,
-            mimi_content,
-        }: UiInReplyToMessage,
-    ) -> Self {
-        InReplyToMessage {
-            message_id,
-            sender: sender.into(),
-            mimi_content: mimi_content.into(),
-        }
-    }
-}
+// impl From<UiInReplyToMessage> for InReplyToMessage {
+//     fn from(
+//         UiInReplyToMessage {
+//             message_id,
+//             sender,
+//             mimi_content,
+//             ..
+//         }: UiInReplyToMessage,
+//     ) -> Self {
+//         InReplyToMessage {
+//             message_id,
+//             sender: sender.into(),
+//             mimi_content: mimi_content.into(),
+//         }
+//     }
+// }
 
 /// Status of a chat
 ///

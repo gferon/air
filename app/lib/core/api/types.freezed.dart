@@ -1134,158 +1134,6 @@ $UiErrorMessageCopyWith<$Res> get field0 {
 }
 
 /// @nodoc
-mixin _$UiInReplyToMessage {
-
- MessageId get messageId; UiUserId get sender; UiMimiContent get mimiContent;
-/// Create a copy of UiInReplyToMessage
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$UiInReplyToMessageCopyWith<UiInReplyToMessage> get copyWith => _$UiInReplyToMessageCopyWithImpl<UiInReplyToMessage>(this as UiInReplyToMessage, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UiInReplyToMessage&&(identical(other.messageId, messageId) || other.messageId == messageId)&&(identical(other.sender, sender) || other.sender == sender)&&(identical(other.mimiContent, mimiContent) || other.mimiContent == mimiContent));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,messageId,sender,mimiContent);
-
-@override
-String toString() {
-  return 'UiInReplyToMessage(messageId: $messageId, sender: $sender, mimiContent: $mimiContent)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $UiInReplyToMessageCopyWith<$Res>  {
-  factory $UiInReplyToMessageCopyWith(UiInReplyToMessage value, $Res Function(UiInReplyToMessage) _then) = _$UiInReplyToMessageCopyWithImpl;
-@useResult
-$Res call({
- MessageId messageId, UiUserId sender, UiMimiContent mimiContent
-});
-
-
-$UiMimiContentCopyWith<$Res> get mimiContent;
-
-}
-/// @nodoc
-class _$UiInReplyToMessageCopyWithImpl<$Res>
-    implements $UiInReplyToMessageCopyWith<$Res> {
-  _$UiInReplyToMessageCopyWithImpl(this._self, this._then);
-
-  final UiInReplyToMessage _self;
-  final $Res Function(UiInReplyToMessage) _then;
-
-/// Create a copy of UiInReplyToMessage
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? messageId = null,Object? sender = null,Object? mimiContent = null,}) {
-  return _then(_self.copyWith(
-messageId: null == messageId ? _self.messageId : messageId // ignore: cast_nullable_to_non_nullable
-as MessageId,sender: null == sender ? _self.sender : sender // ignore: cast_nullable_to_non_nullable
-as UiUserId,mimiContent: null == mimiContent ? _self.mimiContent : mimiContent // ignore: cast_nullable_to_non_nullable
-as UiMimiContent,
-  ));
-}
-/// Create a copy of UiInReplyToMessage
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UiMimiContentCopyWith<$Res> get mimiContent {
-  
-  return $UiMimiContentCopyWith<$Res>(_self.mimiContent, (value) {
-    return _then(_self.copyWith(mimiContent: value));
-  });
-}
-}
-
-
-
-/// @nodoc
-
-
-class _UiInReplyToMessage implements UiInReplyToMessage {
-  const _UiInReplyToMessage({required this.messageId, required this.sender, required this.mimiContent});
-  
-
-@override final  MessageId messageId;
-@override final  UiUserId sender;
-@override final  UiMimiContent mimiContent;
-
-/// Create a copy of UiInReplyToMessage
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$UiInReplyToMessageCopyWith<_UiInReplyToMessage> get copyWith => __$UiInReplyToMessageCopyWithImpl<_UiInReplyToMessage>(this, _$identity);
-
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UiInReplyToMessage&&(identical(other.messageId, messageId) || other.messageId == messageId)&&(identical(other.sender, sender) || other.sender == sender)&&(identical(other.mimiContent, mimiContent) || other.mimiContent == mimiContent));
-}
-
-
-@override
-int get hashCode => Object.hash(runtimeType,messageId,sender,mimiContent);
-
-@override
-String toString() {
-  return 'UiInReplyToMessage(messageId: $messageId, sender: $sender, mimiContent: $mimiContent)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$UiInReplyToMessageCopyWith<$Res> implements $UiInReplyToMessageCopyWith<$Res> {
-  factory _$UiInReplyToMessageCopyWith(_UiInReplyToMessage value, $Res Function(_UiInReplyToMessage) _then) = __$UiInReplyToMessageCopyWithImpl;
-@override @useResult
-$Res call({
- MessageId messageId, UiUserId sender, UiMimiContent mimiContent
-});
-
-
-@override $UiMimiContentCopyWith<$Res> get mimiContent;
-
-}
-/// @nodoc
-class __$UiInReplyToMessageCopyWithImpl<$Res>
-    implements _$UiInReplyToMessageCopyWith<$Res> {
-  __$UiInReplyToMessageCopyWithImpl(this._self, this._then);
-
-  final _UiInReplyToMessage _self;
-  final $Res Function(_UiInReplyToMessage) _then;
-
-/// Create a copy of UiInReplyToMessage
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? messageId = null,Object? sender = null,Object? mimiContent = null,}) {
-  return _then(_UiInReplyToMessage(
-messageId: null == messageId ? _self.messageId : messageId // ignore: cast_nullable_to_non_nullable
-as MessageId,sender: null == sender ? _self.sender : sender // ignore: cast_nullable_to_non_nullable
-as UiUserId,mimiContent: null == mimiContent ? _self.mimiContent : mimiContent // ignore: cast_nullable_to_non_nullable
-as UiMimiContent,
-  ));
-}
-
-/// Create a copy of UiInReplyToMessage
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UiMimiContentCopyWith<$Res> get mimiContent {
-  
-  return $UiMimiContentCopyWith<$Res>(_self.mimiContent, (value) {
-    return _then(_self.copyWith(mimiContent: value));
-  });
-}
-}
-
-/// @nodoc
 mixin _$UiMessage {
 
  Object get field0;
@@ -1504,7 +1352,7 @@ $Res call({
 });
 
 
-$UiInReplyToMessageCopyWith<$Res>? get inReplyTo;
+
 
 }
 /// @nodoc
@@ -1527,19 +1375,7 @@ as DateTime,isCommitted: null == isCommitted ? _self.isCommitted : isCommitted /
 as bool,
   ));
 }
-/// Create a copy of UiMessageDraft
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UiInReplyToMessageCopyWith<$Res>? get inReplyTo {
-    if (_self.inReplyTo == null) {
-    return null;
-  }
 
-  return $UiInReplyToMessageCopyWith<$Res>(_self.inReplyTo!, (value) {
-    return _then(_self.copyWith(inReplyTo: value));
-  });
-}
 }
 
 
@@ -1547,8 +1383,8 @@ $UiInReplyToMessageCopyWith<$Res>? get inReplyTo {
 /// @nodoc
 
 
-class _UiMessageDraft implements UiMessageDraft {
-  const _UiMessageDraft({required this.message, this.editingId, this.inReplyTo, required this.updatedAt, required this.isCommitted});
+class _UiMessageDraft extends UiMessageDraft {
+  const _UiMessageDraft({required this.message, this.editingId, this.inReplyTo, required this.updatedAt, required this.isCommitted}): super._();
   
 
 @override final  String message;
@@ -1591,7 +1427,7 @@ $Res call({
 });
 
 
-@override $UiInReplyToMessageCopyWith<$Res>? get inReplyTo;
+
 
 }
 /// @nodoc
@@ -1615,19 +1451,7 @@ as bool,
   ));
 }
 
-/// Create a copy of UiMessageDraft
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UiInReplyToMessageCopyWith<$Res>? get inReplyTo {
-    if (_self.inReplyTo == null) {
-    return null;
-  }
 
-  return $UiInReplyToMessageCopyWith<$Res>(_self.inReplyTo!, (value) {
-    return _then(_self.copyWith(inReplyTo: value));
-  });
-}
 }
 
 /// @nodoc

@@ -12,8 +12,8 @@ use aircommon::{
     identifiers::{AttachmentId, UserId},
 };
 use aircoreclient::{
-    AttachmentProgress, Chat, ChatId, ChatMessage, MessageDraft, MessageId,
-    ProvisionAttachmentError, UploadTaskError, clients::CoreUser, store::Store,
+    AttachmentProgress, Chat, ChatId, ChatMessage, MessageId, ProvisionAttachmentError,
+    UploadTaskError, clients::CoreUser, store::Store,
 };
 pub use aircoreclient::{DebugCapabilities, GroupDebugInfo, RequiredDebugCapabilities};
 use anyhow::{Context as _, bail};
@@ -434,18 +434,23 @@ impl ChatDetailsCubitBase {
 
     pub async fn reply_to_message(&self, message_id: MessageId) -> anyhow::Result<()> {
         // Load message
-        let Some(message) = self.context.store.message(message_id).await? else {
+        let Some(chat_message) = self.context.store.message(message_id).await? else {
             return Ok(());
         };
 
-        // If this message doesn't have a sender, do nothing, it's not worth replying to.
-        let Some(sender) = message.message().sender() else {
+        let message = chat_message.message();
+
+        let Some(sender) = message.sender().cloned() else {
             warn!("tried to reply to a message without sender, this is not possible.");
             return Ok(());
         };
 
-        // If this message doesn't have a content, do nothing
-        let Some(mimi_content) = message.message().mimi_content() else {
+        let Some(mimi_id) = message.mimi_id().cloned() else {
+            warn!("tried to reply to a message without MIMI ID, this is not possible.");
+            return Ok(());
+        };
+
+        let Some(mimi_content) = message.mimi_content().cloned() else {
             warn!("tried to reply to a message without MIMI content, this is not possible.");
             return Ok(());
         };
@@ -462,9 +467,10 @@ impl ChatDetailsCubitBase {
 
             draft.message = String::new();
             draft.in_reply_to = Some(UiInReplyToMessage {
+                mimi_id,
                 message_id,
-                sender: sender.clone().into(),
-                mimi_content: mimi_content.clone().into(),
+                sender: sender.into(),
+                mimi_content: mimi_content.into(),
             });
             draft.is_committed = false;
             true
@@ -478,13 +484,11 @@ impl ChatDetailsCubitBase {
     }
 
     async fn store_draft_from_state(&self) -> anyhow::Result<()> {
-        let draft = self
-            .core
-            .state_tx()
-            .borrow()
-            .chat
-            .as_ref()
-            .and_then(|c| c.draft.into_draft_without_content());
+        let draft = self.core.state_tx().borrow().chat.as_ref().and_then(|c| {
+            c.draft
+                .as_ref()
+                .map(UiMessageDraft::to_draft_without_content)
+        });
         self.context
             .store
             .store_message_draft(self.context.chat_id, draft.as_ref())
@@ -652,7 +656,11 @@ pub(super) async fn load_chat_details(store: &impl Store, chat: Chat) -> UiChatD
 
     let chat_type = UiChatType::load_from_chat_type(store, chat.chat_type).await;
 
-    let draft = store.message_draft(chat.id).await.unwrap_or_default();
+    let draft = store
+        .message_draft(chat.id)
+        .await
+        .unwrap_or_default()
+        .map(Into::into);
 
     UiChatDetails {
         id: chat.id,
